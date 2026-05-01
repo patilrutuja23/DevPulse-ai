@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevPulse AI - Developer Intelligence Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    <h1>DevPulse AI</h1>
+                </div>
+                <nav class="nav">
+                    <button class="nav-btn active" data-module="home">Home</button>
+                    <button class="nav-btn" data-module="context">Code Context</button>
+                    <button class="nav-btn" data-module="pr">PR Guardian</button>
+                    <button class="nav-btn" data-module="incident">Incident Whisperer</button>
+                    <button class="nav-btn" data-module="debt">Debt Radar</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Home Section -->
+            <section id="home-section" class="section active">
+                <div class="hero">
+                    <h2 class="hero-title">Developer Intelligence Platform</h2>
+                    <p class="hero-subtitle">AI-powered code analysis, PR review, bug detection, and technical debt management</p>
+                    
+                    <div class="repo-input-container">
+                        <input 
+                            type="text" 
+                            id="global-repo-url" 
+                            class="repo-input" 
+                            placeholder="Enter GitHub repository URL (e.g., https://github.com/user/repo)"
+                        >
+                        <button id="load-repo-btn" class="btn btn-primary">Load Repository</button>
+                    </div>
+                    
+                    <div id="repo-status" class="repo-status hidden"></div>
+                </div>
+
+                <div class="modules-grid">
+                    <div class="module-card" data-module="context">
+                        <div class="module-icon">📊</div>
+                        <h3>Code Context</h3>
+                        <p>Understand repository architecture, design patterns, and code organization</p>
+                        <button class="btn btn-secondary" onclick="switchModule('context')">Analyze Architecture</button>
+                    </div>
+
+                    <div class="module-card" data-module="pr">
+                        <div class="module-icon">🔍</div>
+                        <h3>PR Guardian</h3>
+                        <p>Automated pull request review with security and quality checks</p>
+                        <button class="btn btn-secondary" onclick="switchModule('pr')">Review PR</button>
+                    </div>
+
+                    <div class="module-card" data-module="incident">
+                        <div class="module-icon">🐛</div>
+                        <h3>Incident Whisperer</h3>
+                        <p>Root cause analysis and intelligent bug fixing suggestions</p>
+                        <button class="btn btn-secondary" onclick="switchModule('incident')">Analyze Bug</button>
+                    </div>
+
+                    <div class="module-card" data-module="debt">
+                        <div class="module-icon">⚠️</div>
+                        <h3>Debt Radar</h3>
+                        <p>Identify and prioritize technical debt across your codebase</p>
+                        <button class="btn btn-secondary" onclick="switchModule('debt')">Scan Debt</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Code Context Section -->
+            <section id="context-section" class="section">
+                <div class="section-header">
+                    <h2>📊 Code Context Analysis</h2>
+                    <p>Understand your repository's architecture and organization</p>
+                </div>
+
+                <div class="input-group">
+                    <label>Repository URL</label>
+                    <input type="text" id="context-repo-url" class="input" placeholder="https://github.com/user/repo">
+                </div>
+
+                <div class="input-group">
+                    <label>Additional Context (Optional)</label>
+                    <textarea id="context-additional" class="textarea" rows="3" placeholder="Any specific questions or areas to focus on..."></textarea>
+                </div>
+
+                <button id="analyze-context-btn" class="btn btn-primary">Analyze Architecture</button>
+
+                <div id="context-results" class="results hidden"></div>
+            </section>
+
+            <!-- PR Guardian Section -->
+            <section id="pr-section" class="section">
+                <div class="section-header">
+                    <h2>🔍 PR Guardian</h2>
+                    <p>Comprehensive pull request review and quality assessment</p>
+                </div>
+
+                <div class="input-group">
+                    <label>Repository URL</label>
+                    <input type="text" id="pr-repo-url" class="input" placeholder="https://github.com/user/repo">
+                </div>
+
+                <div class="input-group">
+                    <label>PR Title</label>
+                    <input type="text" id="pr-title" class="input" placeholder="Add new feature">
+                </div>
+
+                <div class="input-group">
+                    <label>PR Description</label>
+                    <textarea id="pr-description" class="textarea" rows="3" placeholder="Description of the changes..."></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Git Diff</label>
+                    <textarea id="pr-diff" class="textarea" rows="10" placeholder="Paste git diff here..."></textarea>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Base Branch</label>
+                        <input type="text" id="pr-base-branch" class="input" value="main">
+                    </div>
+                    <div class="input-group">
+                        <label>Head Branch</label>
+                        <input type="text" id="pr-head-branch" class="input" placeholder="feature-branch">
+                    </div>
+                </div>
+
+                <button id="analyze-pr-btn" class="btn btn-primary">Review Pull Request</button>
+
+                <div id="pr-results" class="results hidden"></div>
+            </section>
+
+            <!-- Incident Whisperer Section -->
+            <section id="incident-section" class="section">
+                <div class="section-header">
+                    <h2>🐛 Incident Whisperer</h2>
+                    <p>Root cause analysis and intelligent bug fixing</p>
+                </div>
+
+                <div class="input-group">
+                    <label>Repository URL</label>
+                    <input type="text" id="incident-repo-url" class="input" placeholder="https://github.com/user/repo">
+                </div>
+
+                <div class="input-group">
+                    <label>Error Message</label>
+                    <textarea id="incident-error" class="textarea" rows="3" placeholder="TypeError: Cannot read property 'length' of undefined"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Stack Trace (Optional)</label>
+                    <textarea id="incident-stack" class="textarea" rows="5" placeholder="at processArray (app.js:42:15)..."></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Code Snippet (Optional)</label>
+                    <textarea id="incident-code" class="textarea" rows="5" placeholder="function processArray(items) { ... }"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Logs (Optional)</label>
+                    <textarea id="incident-logs" class="textarea" rows="3" placeholder="Application logs..."></textarea>
+                </div>
+
+                <button id="analyze-incident-btn" class="btn btn-primary">Analyze Incident</button>
+
+                <div id="incident-results" class="results hidden"></div>
+            </section>
+
+            <!-- Debt Radar Section -->
+            <section id="debt-section" class="section">
+                <div class="section-header">
+                    <h2>⚠️ Debt Radar</h2>
+                    <p>Identify and prioritize technical debt</p>
+                </div>
+
+                <div class="input-group">
+                    <label>Repository URL</label>
+                    <input type="text" id="debt-repo-url" class="input" placeholder="https://github.com/user/repo">
+                </div>
+
+                <div class="input-group">
+                    <label>Focus Areas (Optional)</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" value="code_smells" checked> Code Smells
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" value="complexity" checked> Complexity
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" value="dependencies" checked> Dependencies
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" value="testing" checked> Testing
+                        </label>
+                    </div>
+                </div>
+
+                <button id="analyze-debt-btn" class="btn btn-primary">Scan Technical Debt</button>
+
+                <div id="debt-results" class="results hidden"></div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevPulse AI - Powered by IBM watsonx</p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Analyzing with AI...</p>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+# DevPulse AI - Backend Dependencies
+# Python 3.9+ required
+
+# Web Framework
+flask==3.0.0
+flask-cors==4.0.0
+
+# IBM watsonx AI SDK
+ibm-watsonx-ai==0.2.6
+
+# HTTP Requests
+requests==2.31.0
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Additional utilities
+urllib3==2.1.0
+certifi==2023.11.17
+
+# Optional: For enhanced functionality
+# Uncomment if needed:
+# pyyaml==6.0.1          # For YAML configuration
+# redis==5.0.1           # For caching
+# sqlalchemy==2.0.23     # For database support
