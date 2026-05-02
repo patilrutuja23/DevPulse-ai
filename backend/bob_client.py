@@ -14,17 +14,27 @@ IAM_TOKEN_URL  = 'https://iam.cloud.ibm.com/identity/token'
 
 def _get_iam_token(api_key: str) -> str:
     """Exchange IBM Cloud API key for a short-lived IAM bearer token."""
-    resp = requests.post(
-        IAM_TOKEN_URL,
-        headers={'Content-Type': 'application/x-www-form-urlencoded'},
-        data={
-            'grant_type': 'urn:ibm:params:oauth:grant-type:apikey',
-            'apikey': api_key,
-        },
-        timeout=15,
-    )
-    resp.raise_for_status()
-    return resp.json()['access_token']
+    try:
+        resp = requests.post(
+            IAM_TOKEN_URL,
+            headers={'Content-Type': 'application/x-www-form-urlencoded'},
+            data={
+                'grant_type': 'urn:ibm:params:oauth:grant-type:apikey',
+                'apikey': api_key,
+            },
+            timeout=15,
+        )
+        resp.raise_for_status()
+        return resp.json()['access_token']
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 400:
+            raise ValueError(
+                'Invalid IBM Cloud API key. Please check:\n'
+                '  1. Your WATSONX_API_KEY in .env is correct\n'
+                '  2. The API key has not expired\n'
+                '  3. Get a new key at: https://cloud.ibm.com/iam/apikeys'
+            ) from e
+        raise
 
 
 class BobClient:

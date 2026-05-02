@@ -71,7 +71,7 @@ def load_repo(repo_url: str, github_token: Optional[str] = None) -> Dict[str, An
         owner, repo = parse_github_url(repo_url)
         headers = {'Accept': 'application/vnd.github.v3+json'}
         if github_token:
-            headers['Authorization'] = f'token {github_token}'
+            headers['Authorization'] = f'Bearer {github_token}'
 
         # Fetch repo metadata
         meta_resp = requests.get(
@@ -113,8 +113,13 @@ def load_repo(repo_url: str, github_token: Optional[str] = None) -> Dict[str, An
         if status == 404:
             return {'error': f'Repository not found: {repo_url}'}
         if status == 403:
-            return {'error': 'GitHub API rate limit exceeded. Add a GITHUB_TOKEN to .env'}
-        return {'error': f'GitHub API error: {str(e)}'}
+            error_msg = 'GitHub API rate limit exceeded'
+            if github_token:
+                error_msg += '. Your token may be invalid or expired. Check GITHUB_TOKEN in .env'
+            else:
+                error_msg += '. Add a valid GITHUB_TOKEN to .env'
+            return {'error': error_msg}
+        return {'error': f'GitHub API error: {status} {str(e)}'}
     except ValueError as e:
         return {'error': str(e)}
     except Exception as e:
@@ -158,7 +163,7 @@ def fetch_file_content(owner: str, repo: str, file_path: str, github_token: Opti
     headers = {'Accept': 'application/vnd.github.v3.raw'}
     
     if github_token:
-        headers['Authorization'] = f'token {github_token}'
+        headers['Authorization'] = f'Bearer {github_token}'
     
     try:
         response = requests.get(url, headers=headers, timeout=10)
@@ -192,7 +197,7 @@ def fetch_repo_tree(owner: str, repo: str, github_token: Optional[str] = None) -
     headers = {}
     
     if github_token:
-        headers['Authorization'] = f'token {github_token}'
+        headers['Authorization'] = f'Bearer {github_token}'
     
     try:
         response = requests.get(url, headers=headers, timeout=15)

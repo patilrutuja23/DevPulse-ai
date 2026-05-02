@@ -19,7 +19,16 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+# Debug: Print token status at startup
+print("=" * 60)
+print("DevPulse AI - Environment Check")
+print("=" * 60)
+github_token_check = os.getenv('GITHUB_TOKEN')
+print(f"ENV TOKEN: {'✓ Present' if github_token_check else '✗ Missing'}")
+if github_token_check:
+    token_preview = github_token_check[:10] + "..." if len(github_token_check) > 10 else "too short"
+    print(f"Token Preview: {token_preview}")
+print("=" * 60)
 
 # Initialise IBM Bob at startup so we fail fast if credentials are missing
 try:
@@ -39,10 +48,11 @@ def err(msg, status=400):
 @app.route('/api/health')
 def health():
     bob_ready = bool(os.getenv('WATSONX_API_KEY') and os.getenv('WATSONX_PROJECT_ID'))
+    github_token = os.getenv('GITHUB_TOKEN')
     return jsonify({
         'status': 'ok',
         'ibm_bob': bob_ready,
-        'github_token': bool(GITHUB_TOKEN)
+        'github_token': bool(github_token)
     })
 
 
@@ -61,7 +71,9 @@ def route_load_repo():
     if not repo_url:
         return err('repo_url is required')
 
-    result = load_repo(repo_url, GITHUB_TOKEN)
+    github_token = os.getenv('GITHUB_TOKEN')
+    print(f"🔑 Using GitHub Token: {'✓ Present' if github_token else '✗ Missing'}")
+    result = load_repo(repo_url, github_token)
 
     if 'error' in result:
         return err(result['error'], 422)
@@ -84,7 +96,9 @@ def route_code_context():
     if not repo_url:
         return err('repo_url is required')
 
-    repo_data = load_repo(repo_url, GITHUB_TOKEN)
+    github_token = os.getenv('GITHUB_TOKEN')
+    print(f"🔑 Using GitHub Token: {'✓ Present' if github_token else '✗ Missing'}")
+    repo_data = load_repo(repo_url, github_token)
     if 'error' in repo_data:
         return err(repo_data['error'], 422)
 
@@ -107,7 +121,9 @@ def route_pr_review():
     if not repo_url:
         return err('repo_url is required')
 
-    repo_data = load_repo(repo_url, GITHUB_TOKEN)
+    github_token = os.getenv('GITHUB_TOKEN')
+    print(f"🔑 Using GitHub Token: {'✓ Present' if github_token else '✗ Missing'}")
+    repo_data = load_repo(repo_url, github_token)
     if 'error' in repo_data:
         return err(repo_data['error'], 422)
 
@@ -152,11 +168,13 @@ def route_debt():
     if not repo_url:
         return err('repo_url is required')
 
-    repo_data = load_repo(repo_url, GITHUB_TOKEN)
+    github_token = os.getenv('GITHUB_TOKEN')
+    print(f"🔑 Using GitHub Token: {'✓ Present' if github_token else '✗ Missing'}")
+    repo_data = load_repo(repo_url, github_token)
     if 'error' in repo_data:
         return err(repo_data['error'], 422)
 
-    result = analyze_debt_radar(repo_data, GITHUB_TOKEN)
+    result = analyze_debt_radar(repo_data, github_token)
     return jsonify({'success': True, 'data': result})
 
 
