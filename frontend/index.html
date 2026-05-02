@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevPulse AI</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-content">
+      <div class="logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="logo-text">DevPulse AI</span>
+      </div>
+      <span class="tagline">Powered by IBM Bob</span>
+    </div>
+  </header>
+
+  <main class="main container">
+
+    <!-- Repo Loader -->
+    <section class="repo-section">
+      <div class="repo-input-row">
+        <input
+          id="repo-url"
+          type="text"
+          class="repo-input"
+          placeholder="https://github.com/owner/repo"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button id="load-btn" class="btn btn-primary" onclick="loadRepo()">
+          Load Repository
+        </button>
+      </div>
+      <div id="repo-status" class="repo-status hidden"></div>
+    </section>
+
+    <!-- Repo Card (shown after load) -->
+    <section id="repo-card" class="repo-card hidden">
+      <div class="repo-card-header">
+        <div>
+          <h2 id="rc-name" class="repo-name"></h2>
+          <p id="rc-desc" class="repo-desc"></p>
+        </div>
+        <div class="repo-meta">
+          <span id="rc-lang" class="badge badge-lang"></span>
+          <span id="rc-stars" class="badge badge-stars">⭐ 0</span>
+          <span id="rc-files" class="badge badge-files">📁 0 files</span>
+        </div>
+      </div>
+
+      <!-- Module Buttons -->
+      <div class="module-buttons">
+        <button class="module-btn" id="btn-context" onclick="runModule('code-context')" disabled>
+          <span class="module-icon">📊</span>
+          <span class="module-label">Code Context</span>
+          <span class="module-sub">Architecture & Stack</span>
+        </button>
+        <button class="module-btn" id="btn-pr" onclick="runModule('pr-review')" disabled>
+          <span class="module-icon">🔍</span>
+          <span class="module-label">PR Guardian</span>
+          <span class="module-sub">Repo Health Check</span>
+        </button>
+        <button class="module-btn" id="btn-debt" onclick="runModule('debt')" disabled>
+          <span class="module-icon">⚠️</span>
+          <span class="module-label">Debt Radar</span>
+          <span class="module-sub">Technical Debt</span>
+        </button>
+        <button class="module-btn module-btn-incident" id="btn-incident" onclick="showIncidentForm()" disabled>
+          <span class="module-icon">🐛</span>
+          <span class="module-label">Incident Whisperer</span>
+          <span class="module-sub">Debug Error</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Incident Form (shown on demand) -->
+    <section id="incident-form" class="incident-form hidden">
+      <h3 class="form-title">🐛 Incident Whisperer</h3>
+      <div class="input-group">
+        <label>Error Message</label>
+        <textarea id="error-msg" class="textarea" rows="3"
+          placeholder="e.g. TypeError: Cannot read properties of undefined (reading 'map')"></textarea>
+      </div>
+      <div class="input-group">
+        <label>Code Snippet</label>
+        <textarea id="code-snippet" class="textarea code-font" rows="8"
+          placeholder="Paste the relevant code here..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="runIncident()">Analyze Bug</button>
+        <button class="btn btn-ghost" onclick="hideIncidentForm()">Cancel</button>
+      </div>
+    </section>
+
+    <!-- Loading -->
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <span id="loading-text">Analyzing...</span>
+    </div>
+
+    <!-- Results Panel -->
+    <section id="results" class="results hidden"></section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">DevPulse AI · Built with IBM Bob</div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

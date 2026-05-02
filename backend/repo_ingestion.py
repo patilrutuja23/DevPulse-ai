@@ -1,6 +1,6 @@
 """
 GitHub Repository Ingestion Module
-Fetches repository structure and file contents from GitHub API
+Fetches repository metadata and file list from GitHub API
 """
 
 import os
@@ -11,7 +11,8 @@ from urllib.parse import urlparse
 
 
 # File extensions to include
-SUPPORTED_EXTENSIONS = {'.py', '.js', '.ts', '.tsx', '.jsx', '.java', '.go', '.rs', '.cpp', '.c', '.h', '.hpp'}
+SUPPORTED_EXTENSIONS = {'.py', '.js', '.ts', '.tsx', '.jsx', '.java', '.go', '.rs', '.cpp', '.c', '.h', '.hpp',
+                         '.css', '.html', '.json', '.md', '.yml', '.yaml', '.toml', '.env', '.txt'}
 
 # Directories to exclude
 EXCLUDED_DIRS = {
@@ -59,6 +60,65 @@ def parse_github_url(repo_url: str) -> tuple[str, str]:
             return owner, repo
     
     raise ValueError(f"Invalid GitHub URL format: {repo_url}")
+
+
+def load_repo(repo_url: str, github_token: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Load repository metadata and file list from GitHub API.
+    Returns name, description, stars, language, and files list.
+    """
+    try:
+        owner, repo = parse_github_url(repo_url)
+        headers = {'Accept': 'application/vnd.github.v3+json'}
+        if github_token:
+            headers['Authorization'] = f'token {github_token}'
+
+        # Fetch repo metadata
+        meta_resp = requests.get(
+            f'https://api.github.com/repos/{owner}/{repo}',
+            headers=headers, timeout=10
+        )
+        meta_resp.raise_for_status()
+        meta = meta_resp.json()
+
+        # Fetch root contents for file list
+        contents_resp = requests.get(
+            f'https://api.github.com/repos/{owner}/{repo}/contents',
+            headers=headers, timeout=10
+        )
+        contents_resp.raise_for_status()
+        contents = contents_resp.json()
+
+        files = [
+            item['name'] for item in contents
+            if item['type'] in ('file', 'dir')
+        ]
+
+        return {
+            'name': meta.get('name', repo),
+            'description': meta.get('description') or 'No description provided',
+            'stars': meta.get('stargazers_count', 0),
+            'language': meta.get('language') or 'Unknown',
+            'owner': owner,
+            'repo': repo,
+            'files': files,
+            'full_name': meta.get('full_name', f'{owner}/{repo}'),
+            'default_branch': meta.get('default_branch', 'main'),
+            'open_issues': meta.get('open_issues_count', 0),
+            'forks': meta.get('forks_count', 0),
+        }
+
+    except requests.exceptions.HTTPError as e:
+        status = e.response.status_code if e.response else 0
+        if status == 404:
+            return {'error': f'Repository not found: {repo_url}'}
+        if status == 403:
+            return {'error': 'GitHub API rate limit exceeded. Add a GITHUB_TOKEN to .env'}
+        return {'error': f'GitHub API error: {str(e)}'}
+    except ValueError as e:
+        return {'error': str(e)}
+    except Exception as e:
+        return {'error': f'Failed to load repository: {str(e)}'}
 
 
 def should_include_file(file_path: str) -> bool:
