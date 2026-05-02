@@ -59,7 +59,9 @@ def _analyze_file_sizes(tree_items: List[Dict]) -> Tuple[List[Dict], int]:
                 'severity': 'high' if size > 500000 else 'medium',
                 'file': path,
                 'detail': f'File size is {round(size/1024, 1)}KB, which may impact performance and maintainability',
-                'suggestion': 'Consider splitting into smaller modules, lazy loading, or moving to external storage'
+                'suggestion': 'Consider splitting into smaller modules, lazy loading, or moving to external storage',
+                'businessImpact': 'Slows down development, increases merge conflicts, harder to review and test',
+                'priorityLevel': 'High' if size > 500000 else 'Medium'
             })
     
     return issues, len(large_files)
@@ -78,7 +80,9 @@ def _check_missing_tests(files: List[str]) -> List[Dict]:
             'severity': 'critical',
             'file': 'N/A',
             'detail': 'No test files detected in repository, indicating zero test coverage',
-            'suggestion': 'Implement unit tests using Jest, Pytest, or appropriate framework. Aim for 80%+ coverage'
+            'suggestion': 'Implement unit tests using Jest, Pytest, or appropriate framework. Aim for 80%+ coverage',
+            'businessImpact': 'High risk of production bugs, expensive hotfixes, customer dissatisfaction',
+            'priorityLevel': 'Critical'
         })
     else:
         # Check if test coverage is adequate (heuristic: 1 test file per 5 source files)
@@ -91,7 +95,9 @@ def _check_missing_tests(files: List[str]) -> List[Dict]:
                 'severity': 'high',
                 'file': 'N/A',
                 'detail': f'Only {len(test_files)} test files for {len(source_files)} source files (ratio: 1:{len(source_files)//max(len(test_files), 1)})',
-                'suggestion': 'Increase test coverage by adding more test files. Target ratio of at least 1:5'
+                'suggestion': 'Increase test coverage by adding more test files. Target ratio of at least 1:5',
+                'businessImpact': 'Increased bug risk, slower feature development, costly regressions',
+                'priorityLevel': 'High'
             })
     
     return issues
@@ -109,7 +115,9 @@ def _check_documentation(files: List[str]) -> List[Dict]:
             'severity': 'high',
             'file': 'N/A',
             'detail': 'No README file found, making it difficult for developers to understand the project',
-            'suggestion': 'Create README.md with project overview, setup instructions, and usage examples'
+            'suggestion': 'Create README.md with project overview, setup instructions, and usage examples',
+            'businessImpact': 'Slow developer onboarding, reduced collaboration, poor project adoption',
+            'priorityLevel': 'High'
         })
     
     # Check for docs directory
@@ -120,7 +128,9 @@ def _check_documentation(files: List[str]) -> List[Dict]:
             'severity': 'medium',
             'file': 'N/A',
             'detail': 'Large project without dedicated documentation directory',
-            'suggestion': 'Create docs/ folder with API documentation, architecture guides, and developer notes'
+            'suggestion': 'Create docs/ folder with API documentation, architecture guides, and developer notes',
+            'businessImpact': 'Knowledge silos, difficult maintenance, slower feature development',
+            'priorityLevel': 'Medium'
         })
     
     return issues
@@ -139,7 +149,9 @@ def _check_ci_cd(files: List[str]) -> List[Dict]:
             'severity': 'high',
             'file': 'N/A',
             'detail': 'No continuous integration or deployment configuration detected',
-            'suggestion': 'Set up GitHub Actions, GitLab CI, or Jenkins for automated testing and deployment'
+            'suggestion': 'Set up GitHub Actions, GitLab CI, or Jenkins for automated testing and deployment',
+            'businessImpact': 'Manual deployments increase errors, slower releases, inconsistent quality',
+            'priorityLevel': 'High'
         })
     
     return issues
@@ -160,7 +172,9 @@ def _check_dependency_management(files: List[str]) -> List[Dict]:
             'severity': 'high',
             'file': 'N/A',
             'detail': 'Dependencies defined but no lock file present, leading to non-reproducible builds',
-            'suggestion': 'Commit lock file (package-lock.json, poetry.lock, etc.) to ensure consistent dependencies'
+            'suggestion': 'Commit lock file (package-lock.json, poetry.lock, etc.) to ensure consistent dependencies',
+            'businessImpact': 'Build failures in production, "works on my machine" problems, deployment delays',
+            'priorityLevel': 'High'
         })
     
     return issues
@@ -177,7 +191,9 @@ def _check_security(files: List[str]) -> List[Dict]:
             'severity': 'critical',
             'file': '.env',
             'detail': 'Environment file with secrets is committed to repository',
-            'suggestion': 'Remove .env from git immediately, add to .gitignore, rotate all exposed secrets'
+            'suggestion': 'Remove .env from git immediately, add to .gitignore, rotate all exposed secrets',
+            'businessImpact': 'CRITICAL: Data breach risk, unauthorized access, potential legal liability',
+            'priorityLevel': 'Critical'
         })
     
     # Check for .gitignore
@@ -187,7 +203,9 @@ def _check_security(files: List[str]) -> List[Dict]:
             'severity': 'medium',
             'file': 'N/A',
             'detail': 'No .gitignore file to prevent committing sensitive or unnecessary files',
-            'suggestion': 'Add .gitignore to exclude node_modules, .env, build artifacts, and IDE files'
+            'suggestion': 'Add .gitignore to exclude node_modules, .env, build artifacts, and IDE files',
+            'businessImpact': 'Repository bloat, potential secret exposure, slower clones',
+            'priorityLevel': 'Medium'
         })
     
     return issues
@@ -206,7 +224,9 @@ def _check_code_quality(files: List[str]) -> List[Dict]:
             'severity': 'medium',
             'file': 'N/A',
             'detail': 'No linting or formatting configuration detected',
-            'suggestion': 'Add ESLint, Prettier, Pylint, or similar tools to maintain code consistency'
+            'suggestion': 'Add ESLint, Prettier, Pylint, or similar tools to maintain code consistency',
+            'businessImpact': 'Inconsistent code style, harder code reviews, more bugs slip through',
+            'priorityLevel': 'Medium'
         })
     
     return issues
@@ -224,7 +244,9 @@ def _check_structure(files: List[str]) -> List[Dict]:
             'severity': 'low',
             'file': 'N/A',
             'detail': f'{len(root_files)} files in root directory, making navigation difficult',
-            'suggestion': 'Organize files into subdirectories (src/, config/, docs/, etc.)'
+            'suggestion': 'Organize files into subdirectories (src/, config/, docs/, etc.)',
+            'businessImpact': 'Slower navigation, harder to find files, reduced developer productivity',
+            'priorityLevel': 'Low'
         })
     
     # Check for duplicate patterns (potential code duplication)
@@ -238,7 +260,9 @@ def _check_structure(files: List[str]) -> List[Dict]:
             'severity': 'medium',
             'file': ', '.join(duplicates[:3]),
             'detail': f'Multiple files with similar names detected: {", ".join(duplicates[:3])}',
-            'suggestion': 'Review for code duplication and consider extracting common logic into shared modules'
+            'suggestion': 'Review for code duplication and consider extracting common logic into shared modules',
+            'businessImpact': 'Harder maintenance, bugs fixed in one place but not others, wasted effort',
+            'priorityLevel': 'Medium'
         })
     
     return issues

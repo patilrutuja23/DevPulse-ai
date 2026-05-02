@@ -171,6 +171,51 @@ def _analyze_modules(files: List[str]) -> List[Dict[str, str]]:
     return modules[:10]  # Return top 10 modules
 
 
+def _determine_project_maturity(files: List[str], tech_stack: List[str]) -> str:
+    """
+    Determine project maturity level based on indicators.
+    """
+    maturity_score = 0
+    
+    # File count indicator
+    file_count = len(files)
+    if file_count > 50:
+        maturity_score += 3
+    elif file_count > 20:
+        maturity_score += 2
+    elif file_count > 10:
+        maturity_score += 1
+    
+    # Tech stack diversity
+    if len(tech_stack) > 5:
+        maturity_score += 2
+    elif len(tech_stack) > 3:
+        maturity_score += 1
+    
+    # Key indicators
+    has_tests = any('test' in f.lower() for f in files)
+    has_ci = any('.github/workflows' in f or '.gitlab-ci' in f for f in files)
+    has_docs = any('docs/' in f or 'readme' in f.lower() for f in files)
+    has_license = any('license' in f.lower() for f in files)
+    
+    if has_tests:
+        maturity_score += 2
+    if has_ci:
+        maturity_score += 2
+    if has_docs:
+        maturity_score += 1
+    if has_license:
+        maturity_score += 1
+    
+    # Determine maturity level
+    if maturity_score >= 8:
+        return "Mature"
+    elif maturity_score >= 4:
+        return "Growing"
+    else:
+        return "Early"
+
+
 def _generate_insights(files: List[str], tech_stack: List[str], architecture: str) -> str:
     """
     Generate intelligent insights about the codebase.
@@ -228,6 +273,7 @@ def analyze_code_context(repo_data: dict) -> dict:
     tech_stack = _detect_tech_stack(files + file_tree, lang)
     modules = _analyze_modules(files)
     insights = _generate_insights(files, tech_stack, architecture)
+    project_maturity = _determine_project_maturity(files, tech_stack)
     
     return {
         'architecture': architecture,
@@ -235,6 +281,7 @@ def analyze_code_context(repo_data: dict) -> dict:
         'techStack': tech_stack,
         'modules': modules,
         'insights': insights,
+        'projectMaturity': project_maturity,
         'totalFiles': len(files),
         'repoName': name,
         'language': lang,

@@ -45,7 +45,8 @@ def _check_readme(files: List[str]) -> Dict | None:
             'severity': 'high',
             'check': 'README Missing',
             'message': 'No README file found in repository',
-            'suggestion': 'Add a README.md with project description, setup instructions, and usage examples'
+            'suggestion': 'Add a README.md with project description, setup instructions, and usage examples',
+            'impact': 'Increases onboarding time for new developers and reduces project discoverability'
         }
     return None
 
@@ -60,7 +61,8 @@ def _check_tests(files: List[str]) -> Dict | None:
             'severity': 'high',
             'check': 'No Tests',
             'message': 'No test files detected in repository',
-            'suggestion': 'Add unit tests using Jest, Pytest, or appropriate testing framework'
+            'suggestion': 'Add unit tests using Jest, Pytest, or appropriate testing framework',
+            'impact': 'Significantly increases risk of production bugs and makes refactoring dangerous'
         }
     return None
 
@@ -72,7 +74,8 @@ def _check_gitignore(files: List[str]) -> Dict | None:
             'severity': 'medium',
             'check': 'Missing .gitignore',
             'message': 'No .gitignore file found',
-            'suggestion': 'Add .gitignore to exclude node_modules, .env, build artifacts, and IDE files'
+            'suggestion': 'Add .gitignore to exclude node_modules, .env, build artifacts, and IDE files',
+            'impact': 'May lead to committing sensitive files, dependencies, or build artifacts'
         }
     return None
 
@@ -84,7 +87,8 @@ def _check_env_exposure(files: List[str]) -> Dict | None:
             'severity': 'critical',
             'check': 'Environment File Exposed',
             'message': '.env file is committed to repository',
-            'suggestion': 'Remove .env from git, add to .gitignore, and use .env.example instead'
+            'suggestion': 'Remove .env from git, add to .gitignore, and use .env.example instead',
+            'impact': 'CRITICAL SECURITY RISK: Exposes API keys, passwords, and secrets to public'
         }
     return None
 
@@ -98,7 +102,8 @@ def _check_license(files: List[str]) -> Dict | None:
             'severity': 'low',
             'check': 'No License',
             'message': 'No LICENSE file found',
-            'suggestion': 'Add a LICENSE file (MIT, Apache 2.0, GPL, etc.) to clarify usage rights'
+            'suggestion': 'Add a LICENSE file (MIT, Apache 2.0, GPL, etc.) to clarify usage rights',
+            'impact': 'Legal ambiguity may prevent others from using or contributing to the project'
         }
     return None
 
@@ -113,7 +118,8 @@ def _check_ci_cd(files: List[str]) -> Dict | None:
             'severity': 'medium',
             'check': 'No CI/CD',
             'message': 'No continuous integration configuration detected',
-            'suggestion': 'Set up GitHub Actions, GitLab CI, or Jenkins for automated testing and deployment'
+            'suggestion': 'Set up GitHub Actions, GitLab CI, or Jenkins for automated testing and deployment',
+            'impact': 'Manual testing and deployment increases error risk and slows down releases'
         }
     return None
 
@@ -129,7 +135,8 @@ def _check_dependencies(files: List[str]) -> Dict | None:
             'severity': 'medium',
             'check': 'No Lock File',
             'message': 'Dependency file found but no lock file',
-            'suggestion': 'Commit lock file (package-lock.json, poetry.lock, etc.) to ensure reproducible builds'
+            'suggestion': 'Commit lock file (package-lock.json, poetry.lock, etc.) to ensure reproducible builds',
+            'impact': 'Builds may fail or behave differently across environments due to version mismatches'
         }
     return None
 

@@ -62,6 +62,94 @@ def parse_github_url(repo_url: str) -> tuple[str, str]:
     raise ValueError(f"Invalid GitHub URL format: {repo_url}")
 
 
+def generate_repo_description(files: List[str], language: str, readme_content: Optional[str] = None) -> str:
+    """
+    Generate an intelligent description for a repository based on its files and language.
+    
+    Args:
+        files: List of file names in the repository
+        language: Primary programming language
+        readme_content: Optional README content to extract description from
+    
+    Returns:
+        Generated description string
+    """
+    # Try to extract from README first
+    if readme_content:
+        lines = readme_content.strip().split('\n')
+        # Skip title lines (starting with #) and empty lines
+        for line in lines:
+            line = line.strip()
+            if line and not line.startswith('#') and len(line) > 20:
+                # Return first meaningful line (truncate if too long)
+                return line[:200] + ('...' if len(line) > 200 else '')
+    
+    # Fallback to intelligent pattern matching
+    files_str = " ".join(files).lower()
+    
+    # Frontend frameworks
+    if "react" in files_str or "vite" in files_str or "next.config" in files_str:
+        if "typescript" in language.lower() or ".tsx" in files_str:
+            return "Modern React application built with TypeScript, featuring component-based architecture and type-safe development."
+        return "Frontend web application built with React, focused on dynamic UI and client-side interactions."
+    
+    if "vue" in files_str or "nuxt" in files_str:
+        return "Vue.js application with reactive components and modern frontend architecture."
+    
+    if "angular" in files_str:
+        return "Angular application with structured, enterprise-grade frontend framework."
+    
+    # Backend frameworks
+    if "flask" in files_str or "django" in files_str:
+        return "Python backend API service handling business logic, data processing, and RESTful endpoints."
+    
+    if "express" in files_str or ("server" in files_str and "node" in files_str):
+        return "Node.js backend service providing API endpoints and server-side logic."
+    
+    if "spring" in files_str or "pom.xml" in files_str:
+        return "Java Spring Boot application with enterprise-grade backend architecture."
+    
+    # DevOps & Infrastructure
+    if "docker" in files_str or "dockerfile" in files_str:
+        return "Containerized application designed for scalable deployment using Docker and modern DevOps practices."
+    
+    if "kubernetes" in files_str or "k8s" in files_str:
+        return "Cloud-native application with Kubernetes orchestration for scalable microservices deployment."
+    
+    # Data & ML
+    if "ml" in files_str or "model" in files_str or "train" in files_str:
+        return "Machine learning project involving data processing, model training, and predictive analytics."
+    
+    if "jupyter" in files_str or ".ipynb" in files_str:
+        return "Data science project with Jupyter notebooks for analysis, visualization, and experimentation."
+    
+    # Mobile
+    if "android" in files_str or "gradle" in files_str:
+        return "Android mobile application with native Java/Kotlin development."
+    
+    if "ios" in files_str or "swift" in files_str or ".xcodeproj" in files_str:
+        return "iOS mobile application built with Swift for Apple ecosystem."
+    
+    # Language-specific defaults
+    if language.lower() == "typescript":
+        return "TypeScript-based application with structured, type-safe architecture and modern development practices."
+    
+    if language.lower() == "python":
+        return "Python application with modular code structure and clean architecture patterns."
+    
+    if language.lower() == "javascript":
+        return "JavaScript application with dynamic functionality and modern web development practices."
+    
+    if language.lower() == "go":
+        return "Go application built for performance, concurrency, and efficient system-level operations."
+    
+    if language.lower() == "rust":
+        return "Rust application emphasizing memory safety, performance, and systems programming."
+    
+    # Generic fallback
+    return "Software project with modular code structure, following industry best practices and clean architecture."
+
+
 def load_repo(repo_url: str, github_token: Optional[str] = None) -> Dict[str, Any]:
     """
     Load repository metadata and file list from GitHub API.
@@ -94,9 +182,33 @@ def load_repo(repo_url: str, github_token: Optional[str] = None) -> Dict[str, An
             if item['type'] in ('file', 'dir')
         ]
 
+        # Get description - try GitHub description first
+        description = meta.get('description')
+        
+        # If no description, try to fetch README
+        readme_content = None
+        if not description:
+            for readme_name in ['README.md', 'README.MD', 'readme.md', 'README', 'README.txt']:
+                try:
+                    readme_resp = requests.get(
+                        f'https://api.github.com/repos/{owner}/{repo}/contents/{readme_name}',
+                        headers={**headers, 'Accept': 'application/vnd.github.v3.raw'},
+                        timeout=5
+                    )
+                    if readme_resp.status_code == 200:
+                        readme_content = readme_resp.text[:500]  # First 500 chars
+                        break
+                except:
+                    continue
+        
+        # Generate intelligent description if needed
+        if not description:
+            language = meta.get('language') or 'Unknown'
+            description = generate_repo_description(files, language, readme_content)
+
         return {
             'name': meta.get('name', repo),
-            'description': meta.get('description') or 'No description provided',
+            'description': description,
             'stars': meta.get('stargazers_count', 0),
             'language': meta.get('language') or 'Unknown',
             'owner': owner,

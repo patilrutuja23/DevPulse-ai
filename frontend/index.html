@@ -58,6 +58,15 @@
         </div>
       </div>
 
+      <!-- AI Summary Button (Primary) -->
+      <button class="ai-summary-btn" id="btn-summary" onclick="runRepoSummary()" disabled>
+        <span class="ai-icon">🧠</span>
+        <div class="ai-text">
+          <span class="ai-label">AI Project Summary</span>
+          <span class="ai-sub">Get unified intelligence assessment</span>
+        </div>
+      </button>
+
       <!-- Module Buttons -->
       <div class="module-buttons">
         <button class="module-btn" id="btn-context" onclick="runModule('code-context')" disabled>
@@ -79,6 +88,18 @@
           <span class="module-icon">🐛</span>
           <span class="module-label">Incident Whisperer</span>
           <span class="module-sub">Debug Error</span>
+        </button>
+      </div>
+
+      <!-- 🔥 NEW: Action Buttons -->
+      <div class="action-buttons">
+        <button class="action-btn action-btn-readme" id="btn-readme" onclick="generateReadme()" disabled>
+          <span class="action-icon">📄</span>
+          <span class="action-label">Generate README</span>
+        </button>
+        <button class="action-btn action-btn-fix" id="btn-fix" onclick="fixMyRepo()" disabled>
+          <span class="action-icon">🛠</span>
+          <span class="action-label">Fix My Repo</span>
         </button>
       </div>
     </section>

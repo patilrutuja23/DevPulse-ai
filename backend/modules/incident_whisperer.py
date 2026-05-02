@@ -315,17 +315,130 @@ try {{
     }
 
 
+def _analyze_vague_error(error_message: str, code_snippet: str) -> Dict:
+    """Analyze vague or unclear error descriptions."""
+    error_lower = error_message.lower()
+    
+    # Detect vague error patterns
+    is_vague = any(phrase in error_lower for phrase in [
+        'not working', 'doesnt work', "doesn't work", 'broken',
+        'no output', 'nothing happens', 'no response', 'stuck'
+    ])
+    
+    if is_vague:
+        return {
+            'rootCause': 'Insufficient error information provided',
+            'explanation': (
+                'The error description is too vague to pinpoint the exact issue. '
+                'Common causes include silent failures, missing error handling, '
+                'or incorrect assumptions about code behavior.'
+            ),
+            'fix': (
+                '1. Add console.log() or print() statements to trace execution\n'
+                '2. Check browser console or terminal for actual error messages\n'
+                '3. Verify inputs and outputs at each step\n'
+                '4. Use debugger breakpoints to inspect state\n'
+                '5. Check network tab for failed API calls'
+            ),
+            'updatedCode': f"""// Add debugging to identify the issue
+console.log('Starting execution...');
+try {{
+  {code_snippet}
+  console.log('Execution completed successfully');
+}} catch (error) {{
+  console.error('Error caught:', error);
+  console.error('Stack trace:', error.stack);
+}}""",
+            'reproductionSteps': [
+                'Add logging statements throughout the code',
+                'Run the code and check console output',
+                'Identify where execution stops or behaves unexpectedly',
+                'Look for actual error messages in console'
+            ],
+            'possibleCauses': [
+                'Silent exception being caught and ignored',
+                'Asynchronous operation not completing',
+                'Missing return statement or incorrect logic',
+                'Network request failing without error handling',
+                'Incorrect variable scope or timing issue'
+            ],
+            'debuggingChecklist': [
+                '✓ Check browser/terminal console for errors',
+                '✓ Verify all variables are defined and have expected values',
+                '✓ Confirm functions are being called',
+                '✓ Check network tab for failed requests',
+                '✓ Verify async operations are properly awaited',
+                '✓ Look for typos in variable/function names'
+            ]
+        }
+    
+    # Generic unclear error
+    return {
+        'rootCause': 'Error requires more context for accurate diagnosis',
+        'explanation': (
+            'The provided error information is insufficient for precise analysis. '
+            'More details about the error message, stack trace, or behavior would help.'
+        ),
+        'fix': (
+            '1. Provide the complete error message and stack trace\n'
+            '2. Describe what you expected vs what actually happened\n'
+            '3. Add error handling to capture more details\n'
+            '4. Use debugging tools to inspect runtime state'
+        ),
+        'updatedCode': f"""// Enhanced error handling
+try {{
+  {code_snippet}
+}} catch (error) {{
+  console.error('Error details:', {{
+    message: error.message,
+    stack: error.stack,
+    type: error.constructor.name
+  }});
+  throw error; // Re-throw for visibility
+}}""",
+        'reproductionSteps': [
+            'Run code with enhanced error handling',
+            'Capture complete error details',
+            'Provide full error message for better analysis'
+        ],
+        'possibleCauses': [
+            'Logic error in code flow',
+            'Unexpected input or state',
+            'Missing error handling',
+            'Timing or race condition'
+        ],
+        'debuggingChecklist': [
+            '✓ Get complete error message',
+            '✓ Check all inputs and outputs',
+            '✓ Verify assumptions about code behavior',
+            '✓ Test with different inputs'
+        ]
+    }
+
+
 def analyze_incident(error_message: str, code_snippet: str) -> dict:
     """
     Intelligent bug analysis using pattern matching and error classification.
     NO AI APIs - pure logic-based debugging intelligence.
     """
+    # Check for vague errors first
+    error_lower = error_message.lower()
+    is_vague = any(phrase in error_lower for phrase in [
+        'not working', 'doesnt work', "doesn't work", 'broken',
+        'no output', 'nothing happens', 'no response', 'stuck'
+    ])
+    
+    if is_vague or len(error_message.strip()) < 10:
+        analysis = _analyze_vague_error(error_message, code_snippet)
+        analysis['errorType'] = 'Vague Error Description'
+        analysis['severity'] = 'medium'
+        analysis['errorMessage'] = error_message
+        return analysis
+    
     # Detect error type and severity
     error_type, severity = _detect_error_type(error_message, code_snippet)
     
     # Route to appropriate analyzer
-    error_lower = error_message.lower()
-    
     if 'undefined' in error_lower or 'is not defined' in error_lower:
         analysis = _analyze_undefined_error(error_message, code_snippet)
     elif 'type' in error_lower and 'error' in error_lower:
@@ -339,19 +452,36 @@ def analyze_incident(error_message: str, code_snippet: str) -> dict:
     elif 'network' in error_lower or 'fetch' in error_lower:
         analysis = _analyze_network_error(error_message, code_snippet)
     else:
-        # Generic analysis
+        # Generic analysis with enhanced guidance
         analysis = {
             'rootCause': 'Runtime error in code execution',
             'explanation': 'An error occurred during code execution. Review the error message and stack trace for specific details.',
             'fix': '1. Check the error message for clues\n2. Review recent code changes\n3. Add logging to trace execution\n4. Use debugger to step through code',
-            'updatedCode': f"// Add error handling\ntry {{\n  {code_snippet}\n}} catch (error) {{\n  console.error('Error:', error);\n}}",
-            'reproductionSteps': ['Execute the code', 'Observe the error', 'Review error details']
+            'updatedCode': f"// Add error handling\ntry {{\n  {code_snippet}\n}} catch (error) {{\n  console.error('Error:', error);\n  console.error('Stack:', error.stack);\n}}",
+            'reproductionSteps': ['Execute the code', 'Observe the error', 'Review error details'],
+            'possibleCauses': [
+                'Logic error in code',
+                'Unexpected input or state',
+                'Missing error handling'
+            ],
+            'debuggingChecklist': [
+                '✓ Read error message carefully',
+                '✓ Check stack trace for error location',
+                '✓ Verify inputs and state',
+                '✓ Add logging for visibility'
+            ]
         }
     
     # Add error type and severity
     analysis['errorType'] = error_type
     analysis['severity'] = severity
     analysis['errorMessage'] = error_message
+    
+    # Ensure possibleCauses and debuggingChecklist exist
+    if 'possibleCauses' not in analysis:
+        analysis['possibleCauses'] = ['Review error message for specific cause']
+    if 'debuggingChecklist' not in analysis:
+        analysis['debuggingChecklist'] = ['✓ Check error message', '✓ Review code logic']
     
     return analysis
 
