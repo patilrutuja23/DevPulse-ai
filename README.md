@@ -8,7 +8,7 @@
 ## 🎥 Demo Video
 
 
-[![Watch the demo](https://img.youtube.com/vi/-BriVwQkfJg/0.jpg)](https://www.youtube.com/watch?v=-BriVwQkfJg)
+[![Watch the demo](https://img.youtube.com/vi/Tgv5SjyRyPA/0.jpg)](https://www.youtube.com/watch?v=Tgv5SjyRyPA)
 
 A comprehensive AI-powered developer intelligence platform with 4 specialized modules for code analysis, PR review, bug detection, and technical debt management.
 .
