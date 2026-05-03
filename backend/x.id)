@@ -1,5 +1,0 @@
-{
-  "rootCause": "Null/Undefined Property Access",
-  "severity": "high",
-  "errorType": "JavaScript Runtime Error"
-}
