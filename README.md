@@ -4,9 +4,10 @@
 ![Python](https://img.shields.io/badge/Python-3.9+-green)
 ![IBM watsonx](https://img.shields.io/badge/IBM-watsonx-blue)
 
+
 ## 🎥 Demo Video
 
-[![Watch the demo](https://img.youtube.com/vi/PqMF4RbWQgE/0.jpg)](https://www.youtube.com/watch?v=PqMF4RbWQgE)
+[![Watch the demo](https://img.youtube.com/vi/BriVwQkfJg/0.jpg)](https://www.youtube.com/watch?v=BriVwQkfJg)
 
 A comprehensive AI-powered developer intelligence platform with 4 specialized modules for code analysis, PR review, bug detection, and technical debt management.
 .
